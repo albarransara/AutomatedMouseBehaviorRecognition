@@ -1,0 +1,49 @@
+# Program to run
+program: resnetLStM.py
+
+# Method
+method: bayes
+
+# Project mthis sweep is part of
+project: mouse_behaviour
+entity: albarransara
+
+# Metric to optimize
+metric:
+    name: PRC
+    goal: maximize
+
+# Parameters spize
+parameters:
+    abs_path:
+        value: '/Users/saraalbarran/Jupyterfiles/Uni/ratolins/code2/'
+    backbone: 
+        value: 'resnet'
+    layers: 
+        value: 'lstm'
+    dropout_rate: 
+        value: 0.5
+    loss: 
+        value: 'binary_crossentropy'
+    optimizer: 
+        value: 'adam'
+    learning_rate:
+        value: 0.001
+    epochs: 
+        value: 50
+    es_monitor: 
+        value: 'val_prc'
+    es_mode: 
+        value: 'max'
+    es_patience: 
+        value: 5
+    reuse_actors: 
+        value: False
+    sequence_length: 
+        values: [300, 600, 1650]
+    num_layers: 
+        values: [1, 2, 3]
+    num_units: 
+        values: [64, 128, 256]
+    batch_size:
+        values: [8, 16, 32]

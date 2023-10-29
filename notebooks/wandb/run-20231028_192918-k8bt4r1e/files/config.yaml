@@ -1,0 +1,78 @@
+wandb_version: 1
+
+abs_path:
+  desc: null
+  value: /Users/saraalbarran/Jupyterfiles/Uni/ratolins/code/
+backbone:
+  desc: null
+  value: resnet
+batch_size:
+  desc: null
+  value: 8
+dropout_rate:
+  desc: null
+  value: 0.5
+epochs:
+  desc: null
+  value: 50
+es_mode:
+  desc: null
+  value: max
+es_monitor:
+  desc: null
+  value: val_prc
+es_patience:
+  desc: null
+  value: 5
+layers:
+  desc: null
+  value: lstm
+learning_rate:
+  desc: null
+  value: 0.001
+loss:
+  desc: null
+  value: binary_crossentropy
+num_layers:
+  desc: null
+  value: 1
+num_units:
+  desc: null
+  value: 256
+optimizer:
+  desc: null
+  value: adam
+reuse_actors:
+  desc: null
+  value: false
+sequence_length:
+  desc: null
+  value: 600
+_wandb:
+  desc: null
+  value:
+    python_version: 3.10.10
+    cli_version: 0.15.12
+    framework: keras
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1698514158.783517
+    t:
+      1:
+      - 2
+      - 3
+      - 55
+      2:
+      - 2
+      - 3
+      - 55
+      3:
+      - 16
+      - 23
+      - 37
+      4: 3.10.10
+      5: 0.15.12
+      8:
+      - 4
+      - 5
+      13: darwin-arm64

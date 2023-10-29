@@ -1,0 +1,48 @@
+{
+    "os": "macOS-13.2.1-arm64-arm-64bit",
+    "python": "3.10.10",
+    "heartbeatAt": "2023-10-21T11:35:44.258204",
+    "startedAt": "2023-10-21T11:35:42.681774",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "--abs_path=/Users/saraalbarran/Jupyterfiles/Uni/ratolins/code/",
+        "--backbone=resnet",
+        "--batch_size=16",
+        "--dropout_rate=0.5",
+        "--epochs=50",
+        "--es_mode=max",
+        "--es_monitor=val_prc",
+        "--es_patience=5",
+        "--layers=lstm",
+        "--learning_rate=0.001",
+        "--loss=binary_crossentropy",
+        "--num_layers=2",
+        "--num_units=128",
+        "--optimizer=adam",
+        "--reuse_actors=False",
+        "--sequence_length=1650"
+    ],
+    "state": "running",
+    "program": "/Users/saraalbarran/Jupyterfiles/Uni/ratolins/code/notebooks/resnetLSM.py",
+    "codePathLocal": "resnetLSM.py",
+    "codePath": "resnetLSM.py",
+    "host": "Saras-Mac-mini.home",
+    "username": "saraalbarran",
+    "executable": "/Users/saraalbarran/miniconda3/bin/python",
+    "cpu_count": 8,
+    "cpu_count_logical": 8,
+    "disk": {
+        "/": {
+            "total": 228.27386474609375,
+            "used": 144.60967636108398
+        }
+    },
+    "gpuapple": {
+        "type": "arm",
+        "vendor": "Apple"
+    },
+    "memory": {
+        "total": 8.0
+    }
+}

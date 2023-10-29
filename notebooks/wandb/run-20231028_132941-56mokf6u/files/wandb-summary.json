@@ -1,0 +1,1 @@
+{"TruePositives": 588.0, "_timestamp": 1698492907.532483, "_runtime": 326.0620610713959, "_step": 7, "FalsePositives": 8531.0, "TrueNegatives": 21562.0, "FalseNegatives": 1719.0, "Accuracy": 0.6836419701576233, "Precision": 0.0644807517528534, "Recall": 0.2548764646053314, "PRC": 0.0622326135635376, "_wandb": {"runtime": 325}}

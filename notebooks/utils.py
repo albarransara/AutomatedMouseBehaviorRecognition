@@ -10,7 +10,7 @@ from sklearn.metrics import precision_recall_curve
 import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (15, 5)
 import seaborn as sns
-
+from keras.callbacks import *
 
 METRIC_NAMES = [
     'TruePositives',
@@ -44,21 +44,34 @@ def load_dataset(path, backbone, sets=['train', 'test']):
         for f, l in zip(feature_files, label_files):
             features.append(np.load(os.path.join(path, backbone, set, 'features', f)))
             labels.append(pd.read_csv(os.path.join(path, backbone, set, 'labels', l)).values)
+        
         dataset[set] = {
             'features': np.concatenate(features, axis=0),
             'labels': np.concatenate(labels, axis=0),
             'num_videos': len(feature_files),
         }
+
     return dataset
 
 
 def generate_sequences(data, seq_length):
     '''
     Generate the sequences by splitting the data
-    '''
-    X = np.array([data['features'][i:i+seq_length] for i in range(0, data['features'].shape[0], seq_length)])
-    y = np.array([data['labels'][i:i+seq_length] for i in range(0, data['labels'].shape[0], seq_length)])
-    return X, y
+    '''    
+    print('hola:(')
+    print(data['features'].shape[0])
+    print(data['labels'].shape[0])
+    lenght =  (data['features'].shape[0] // seq_length) * seq_length
+    features = data['features'][:lenght]
+    labels = data['labels'][:lenght]
+
+    x = np.array([features[i:i+seq_length] for i in range(0,features.shape[0], seq_length)])
+    y = np.array([labels[i:i+seq_length] for i in range(0, labels.shape[0], seq_length)])
+    print(np.shape(features))
+    print(np.shape(data['features']),np.shape(data['labels']))
+    print(np.shape(x),np.shape(y))
+    
+    return x, y
 
 
 def compute_sample_weights(y_train):
@@ -134,7 +147,7 @@ def make_model(input_shape, layers, dropout_rate=0.5, num_layers=1, num_units=12
 
 def tune_train(config):
     keras.backend.clear_session()
-    tune.utils.wait_for_gpu(target_util=0.2)
+    #tune.utils.wait_for_gpu(target_util=0.2)
     # Load data
     dataset = load_dataset(os.path.join(config['abs_path'], 'data/processed/Dataset'), config['backbone'], ['train'])
 
@@ -217,13 +230,16 @@ def grid_search(config):
         config=config,
         metric='accuracy',
         mode='max',
-        resources_per_trial={'cpu': 12, 'gpu': 1},
+        resources_per_trial={'cpu': 12.0,'gpu':1.0},
         # resume=True,
         # name='tune_train_2022-05-18_19-16-40',
         raise_on_failed_trial=False,
         verbose=1,
     )
     return analysis.get_best_config(metric='accuracy', mode='max')
+
+def bayesian_optimization(config):
+    pass
 
 
 def plot_cm(labels, predictions, p=0.5):
@@ -286,6 +302,25 @@ def train_test_model(config):
             loss=config['loss'], optimizer=config['optimizer'],
             learning_rate=config['learning_rate'],
         )
+
+        # Save model's weights 
+        model_filename = 'resnet_lstm.{0:03d}.hdf5'
+        last_finished_epoch = None
+
+        # Define the callback to save the best weights for the 3 models
+        if BEHAVIOR_NAMES[b_idx] == 'Grooming':
+            sav = ModelCheckpoint(filepath='resnet_lstm_accuracy_grooming.h5', verbose=1,
+                                  save_best_only=True, save_freq='epoch', monitor='accuracy', )
+        elif BEHAVIOR_NAMES[b_idx] == 'Mid Rearing':
+            sav = ModelCheckpoint(filepath='resnet_lstm_accuracy_mid_rearing.h5', verbose=1,
+                                  save_best_only=True, save_freq='epoch', monitor='accuracy', )
+        elif BEHAVIOR_NAMES[b_idx] == 'Wall Rearing':
+            sav = ModelCheckpoint(filepath='resnet_lstm_accuracy_wall_rearing.h5', verbose=1,
+                                  save_best_only=True, save_freq='epoch', monitor='accuracy', )
+        else:
+            sav = ModelCheckpoint(filepath='resnet_lstm_accuracy.h5', verbose=1,
+                                  save_best_only=True, save_freq='epoch', monitor='accuracy', )
+
         # Train model
         history = model.fit(
             X_train, y_behavior_train,
@@ -294,15 +329,7 @@ def train_test_model(config):
             epochs=config['epochs'],
             verbose=False,
             shuffle=True,
-            callbacks=[
-                keras.callbacks.EarlyStopping(
-                    monitor=config['es_monitor'],
-                    mode=config['es_mode'],
-                    patience=config['es_patience'],
-                    restore_best_weights=True,
-                    verbose=False,
-                ),
-            ],
+            callbacks= sav,
             sample_weight=sample_weights,
         )
         # Evaluate model
