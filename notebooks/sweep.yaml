@@ -4,7 +4,7 @@ program: resnetLStM.py
 # Method
 method: bayes
 
-# Project mthis sweep is part of
+# Project this sweep is part of
 project: mouse_behaviour
 entity: albarransara
 
