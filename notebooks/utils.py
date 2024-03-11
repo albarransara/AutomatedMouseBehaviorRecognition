@@ -58,17 +58,18 @@ def generate_sequences(data, seq_length):
     '''
     Generate the sequences by splitting the data
     '''    
-    print('hola:(')
-    print(data['features'].shape[0])
-    print(data['labels'].shape[0])
-    lenght =  (data['features'].shape[0] // seq_length) * seq_length
-    features = data['features'][:lenght]
-    labels = data['labels'][:lenght]
+    #lenght =  (data['features'].shape[0] // seq_length) * seq_length
+    #features = data['features'][:lenght]
+    #labels = data['labels'][:lenght]
 
-    x = np.array([features[i:i+seq_length] for i in range(0,features.shape[0], seq_length)])
-    y = np.array([labels[i:i+seq_length] for i in range(0, labels.shape[0], seq_length)])
-    print(np.shape(features))
-    print(np.shape(data['features']),np.shape(data['labels']))
+    #x = np.array([features[i:i+seq_length] for i in range(0,features.shape[0], seq_length)])
+    #y = np.array([labels[i:i+seq_length] for i in range(0, labels.shape[0], seq_length)])
+
+    x = np.array([data['features'][i:i+seq_length] for i in range(0, data['features'].shape[0],seq_length)])
+    y = np.array([data['labels'][i:i+seq_length] for i in range(0, data['labels'].shape[0], seq_length)])
+    
+    #print(np.shape(features))
+    #print(np.shape(data['features']),np.shape(data['labels']))
     print(np.shape(x),np.shape(y))
     
     return x, y

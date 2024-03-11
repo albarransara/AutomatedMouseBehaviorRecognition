@@ -1,10 +1,10 @@
 # Program to run
-program: resnetLStM.py
+program: resnetLSTM.py
 
 # Method
 method: bayes
 
-# Project mthis sweep is part of
+# Project this sweep is part of
 project: mouse_behaviour
 entity: albarransara
 
@@ -16,7 +16,7 @@ metric:
 # Parameters spize
 parameters:
     abs_path:
-        value: '/Users/saraalbarran/Jupyterfiles/Uni/ratolins/code2/'
+        value: '/Users/saraalbarran/Jupyterfiles/Uni/AutomatedMouseBehaviorRecognition/'
     backbone: 
         value: 'resnet'
     layers: 

@@ -22,12 +22,12 @@ METRIC_NAMES = [
 # Behaviors to train
 BEHAVIOR_NAMES = [
     'Grooming',
-#    'Mid Rearing',
-#    'Wall Rearing',
+#    'Rearing'
 ]
 
 default_config = {
-    'abs_path': '/Users/saraalbarran/Jupyterfiles/Uni/ratolins/code2/', 
+    'abs_path':
+    '/Users/saraalbarran/Jupyterfiles/Uni/ratolins/AutomatedMouseBehaviorRecognition/', 
     'sequence_length': 300, 
     'backbone': 'resnet',
     'layers': 'lstm',
@@ -58,11 +58,33 @@ def generate_sequences(data, seq_length):
     #print(np.shape(features))
     #print(np.shape(data['features']),np.shape(data['labels']))
     #print(np.shape(x),np.shape(y))
+
+    print(np.array(data['features']).shape)
+    print(np.array(data['labels']).shape)
+
+    # Check if the data is easibily dividible in sequences
+    devidible = data['features'].shape[0] % seq_length
+
+    # Save las real frame position
+    if devidible != 0:
+        pos = data['features'].shape[0]
+    else:
+        pos = -1
     
+    # If it is so, we can fill the last batch with already exitsting data so the model can handel it. 
+    while devidible != 0:
+        data['features'] = np.append(data['features'],data['features'][-1].reshape((1,data['features'].shape[1])), axis=0)
+        data['labels'] = np.append(data['labels'],data['labels'][-1].reshape((1,data['labels'].shape[1])), axis=0)
+        devidible = data['features'].shape[0] % seq_length
+
+    print(np.array(data['features']).shape)
+    print(np.array(data['labels']).shape)
+
+    # Once data is adjustes, we can split it
     x = np.array([data['features'][i:i+seq_length] for i in range(0, data['features'].shape[0],seq_length)])
     y = np.array([data['labels'][i:i+seq_length] for i in range(0, data['labels'].shape[0], seq_length)])
-    
-    return x, y
+            
+    return x, y, pos
 
 # Method to generate datasets 
 def load_dataset(path, backbone, sets=['train', 'test']):
@@ -73,14 +95,34 @@ def load_dataset(path, backbone, sets=['train', 'test']):
         raise Exception('Invalid backbone')
     dataset = {}
     for set in sets:
+        print(set)
         feature_files = [f for f in sorted(os.listdir(os.path.join(path, backbone, set, 'features')))]
         label_files = [f for f in sorted(os.listdir(os.path.join(path, backbone, set, 'labels')))]
+        
         features = []
         labels = []
-        for f, l in zip(feature_files, label_files):
-            features.append(np.load(os.path.join(path, backbone, set, 'features', f)))
-            labels.append(pd.read_csv(os.path.join(path, backbone, set, 'labels', l)).values)
         
+        if '.DS_Store' in feature_files:
+            feature_files.remove('.DS_Store')
+        if '.DS_Store' in label_files:
+            label_files.remove('.DS_Store')
+
+        #print(feature_files)
+        #print(label_files)
+                    
+        for f, l in zip(feature_files, label_files):
+            print(f, np.load(os.path.join(path, backbone, set, 'features', f),allow_pickle=True).shape)
+            print(l, pd.read_csv(os.path.join(path, backbone, set, 'labels', l)).shape)
+
+            features.append(np.load(os.path.join(path, backbone, set, 'features', f),allow_pickle=True))
+            l = pd.read_csv(os.path.join(path, backbone, set, 'labels', l))
+            # If dataframe has 2 columns for rearing (mid and wall), we can convert them to just one
+            if 'rearing_mig' and 'rearing_paret' in l.columns:
+                l["Rearing"] = np.max(l[['rearing_mig', 'rearing_paret']], axis=1)
+                l = l.drop(['rearing_mig', 'rearing_paret'], axis = 1)
+
+            labels.append(l.values)
+            
         dataset[set] = {
             'features': np.concatenate(features, axis=0),
             'labels': np.concatenate(labels, axis=0),
@@ -92,7 +134,8 @@ def load_dataset(path, backbone, sets=['train', 'test']):
 # Method to load data
 def get_data(config): 
     # Load data
-    dataset = load_dataset(os.path.join(config['abs_path'], 'data/processed/Dataset'),
+    #dataset = load_dataset(os.path.join(config['abs_path'], 'data/processed/Dataset'),
+    dataset = load_dataset(os.path.join(config['abs_path']+'data/Dataset'),
                            config['backbone'], ['train', 'test'])
     return dataset
 
@@ -173,8 +216,8 @@ def train(config):
     dataset = get_data(config)
 
     # Split data into sequences
-    X_train, y_train = generate_sequences(dataset['train'], config['sequence_length'])
-    X_test, y_test = generate_sequences(dataset['test'], config['sequence_length'])
+    X_train, y_train, postrain = generate_sequences(dataset['train'], config['sequence_length'])
+    X_test, y_test, postest = generate_sequences(dataset['test'], config['sequence_length'])
 
     #final_metrics = pd.DataFrame(columns=['Behavior'] + METRIC_NAMES)
     
