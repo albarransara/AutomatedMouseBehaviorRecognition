@@ -1,0 +1,11 @@
+pandas
+opencv-python-headless
+tensorflow[and-cuda]
+keras
+numpy
+python-math
+more-itertools
+jupyterlab
+seaborn
+wandb
+matplotlib
